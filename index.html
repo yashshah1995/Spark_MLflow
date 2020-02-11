@@ -1,0 +1,160 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Spark MLlib-MLflow quick guide</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/codelab-elements/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  id="MLflow_spark"
+                  title="Spark MLlib-MLflow quick guide"
+                  environment="web"
+                  feedback-link="https://gitlab.com/yashashah5895">
+    
+      <google-codelab-step label="Overview" duration="1">
+        <h2 is-upgraded>Contents</h2>
+<ul>
+<li>Apache Spark and MLlib</li>
+<li>MLflow Spark</li>
+<li>Execution</li>
+<li>Classification algorithms (In MLlib)</li>
+<li>MLflow integration</li>
+<li>Quick Start &amp; Some technical things</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Apache Spark and MLlib" duration="2">
+        <p>Apache Spark is a fast and general-purpose cluster computing system. It provides high-level APIs in Java, Scala, Python and R, and an optimized engine that supports general execution graphs. It also supports a rich set of higher-level tools including Spark SQL for SQL and structured data processing, MLlib for machine learning, GraphX for graph processing, and Spark Streaming. <strong>MLlib</strong> is Apache Spark&#39;s scalable machine learning library.</p>
+<h2 is-upgraded>Install Pyspark on Jupyter notebook</h2>
+<p>After usual installation of pyspark, it usually works via native python <em>IDLE</em> ide. To have a more intuitive development environment, we can use <em>jupyter notebook</em> for spark development.</p>
+<h3 is-upgraded>In linux</h3>
+<ul>
+<li>Update PySpark driver environment variables: add these lines to your <code>~/.bashrc</code> (or <code>~/.zshrc</code>) file.</li>
+<li><code>export PYSPARK_DRIVER_PYTHON=jupyter</code></li>
+<li><code>export PYSPARK_DRIVER_PYTHON_OPTS=&#39;notebook&#39;</code></li>
+<li>Restart your terminal and launch PySpark again.<h3 is-upgraded>In windows</h3>
+</li>
+<li>Create enviornment variables same as above</li>
+<li>PYSPARK_DRIVER_PYTHON=jupyter</li>
+<li>PYSPARK_DRIVER_PYTHON_OPTS=notebook</li>
+</ul>
+<p><em>(Note: One important note – When configured to run Jupyter notebook, </em><code>spark-submit</code><em> is likely to throw an </em><code>error executing Jupyter command</code><em>. Because you set up to launch Jupyter/Spark notebooks with just the pyspark command, it will cause spark-submit to fail. The solution is set the variable to use python, not jupyter:</em><code>PYSPARK_DRIVER_PYTHON=python</code></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Execution" duration="3">
+        <h3 is-upgraded>Locally in Jupyter notebook</h3>
+<p>You can interepret and excute the program cell-by-cell. Instead of passing arguments in the command line,</p>
+<pre><code>parser = ArgumentParser()
+parser.add_argument(&#34;--experiment_name&#34;, dest=&#34;experiment_name&#34;, help=&#34;experiment_name&#34;, default=&#34;log_reg_pyspark&#34;, required=False)
+parser.add_argument(&#34;--data_path&#34;, dest=&#34;data_path&#34;, help=&#34;data_path&#34;, required=True)
+parser.add_argument(&#34;--parameter&#34;, dest=&#34;parameter&#34;, help=&#34;parameter&#34;, required=True)
+parser.add_argument(&#34;--describe&#34;, dest=&#34;describe&#34;, help=&#34;Describe data&#34;, default=False, action=&#39;store_true&#39;)
+args = parser.parse_args()
+</code></pre>
+<p>pass them as variables.</p>
+<h3 is-upgraded>Locally in a stand-alone cluster</h3>
+<ul>
+<li>Create a local cluster – In your machine run, <code>./bin/spark-class org.apache.spark.deploy.master.Master</code> It will give us an IP:PORT. –For submitting program locally stored in your own system, you don&#39;t need to mention IP port. –For our use-case, we use master URL (spark-submit) with: <code>Local[*]</code> - Run Spark locally with as many worker threads as logical cores on your machine. It can be any K number of cores you want to use.<h3 is-upgraded>For running on cluster</h3>
+<code>spark-submit --master spark://IP port \ example.py –(additional arugments)</code></li>
+</ul>
+<p>or, you can copy the programs and it&#39;s necessary dependencies on to the cluster (in your assigned directory) and run it locally from there.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="MLlib classification algorithm" duration="4">
+        <h3 is-upgraded>Multinomial logistic regression</h3>
+<p>Multiclass classification is supported via multinomial logistic (softmax) regression. In multinomial logistic regression, the algorithm produces K sets of coefficients, or a matrix of dimension K×J where K is the number of outcome classes and J is the number of features. If the algorithm is fit with an intercept term then a length K vector of intercepts is available.</p>
+<h3 is-upgraded>Random Forests</h3>
+<p>Random forests are ensembles of decision trees. Random forests combine many decision trees in order to reduce the risk of overfitting. The spark.ml implementation supports random forests for binary and multiclass classification and for regression, using both continuous and categorical features.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="MLflow Spark" duration="5">
+        <p>For this tutorial we are going to focus on MLlib libaray and use MLFlow for tracking the spark models. For quick-start on MLflow, go <a href="https://gitlab.com/yashashah5895/mlflow_quickstart" target="_blank">here</a></p>
+<p>The  <code>mlflow.spark</code>  module provides an API for logging and loading Spark MLlib models. This module exports Spark MLlib models with the following flavors:</p>
+<h2 is-upgraded>Spark MLlib (native) format</h2>
+<p>Allows models to be loaded as Spark Transformers for scoring in a Spark session. Models with this flavor can be loaded as PySpark PipelineModel objects in Python. This is the main flavor and is always produced. Following are the standard logging functions:</p>
+<p><code>mlflow.spark.load_model</code><em>(_modeluri, _dfstmpdir=None)</em> Load the Spark MLlib model from the path.</p>
+<p><code>mlflow.spark.log_model</code><em>(spark_model, artifact_path, conda_env=None, dfs_tmpdir=None, sample_input=None, registered_model_name=None)</em></p>
+<p>Log a Spark MLlib model as an MLflow artifact for the current run. This uses the MLlib persistence format and produces an MLflow Model with the Spark flavor.</p>
+<h2 is-upgraded>Performance tracking with metrics</h2>
+<p>You log MLflow metrics with log methods in the Tracking API. The log methods support two alternative methods for distinguishing metric values on the x-axis: timestamp and step. Timestamp is an optional long value that represents the time that the metric was logged. timestamp defaults to the current time. step is an optional integer that represents any measurement of training progress (number of training iterations, number of epochs, and so on). step defaults to 0 and has the following requirements and properties:</p>
+<ul>
+<li>Must be a valid 64-bit integer value.</li>
+<li>Can be negative.</li>
+<li>Can be out of order in successive write calls. For example, (1, 3, 2) is a valid sequence.</li>
+<li>Can have &#34;gaps&#34; in the sequence of values specified in successive write calls. For example, (1, 5, 75, -20) is a valid sequence.</li>
+<li>If you specify both a timestamp and a step, metrics are recorded against both axes independently.</li>
+</ul>
+<p>The code and examples shown here are exclusively in python using Pyspark.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Quick Start" duration="7">
+        <p>For this tutorial we are going to</p>
+<ul>
+<li>Build two spark models on Forest Cover type Dataset.</li>
+<li>A predict program which can take already logged model to predict on unseen dataset.</li>
+<li>A program to search for hyperparameter and logging performance metrics.</li>
+</ul>
+<p>For more information about dataset, go <a href="https://www.kaggle.com/uciml/forest-cover-type-dataset" target="_blank">here</a> The data-set is split randomly into 70-30 <em>(cov_train &amp; cov_test)</em> so one part can be used for training and another one for testing the unseen data. *(Note: when using cluster (or spark on top of hadoop( or any hdfs system), the programs must be first copied to hdfs file system <code>hadoop fs -copyFromLocal filename.extension</code>) Additionally, the programs use <code>SparkSession</code> which is supported only from Spark version 2. So in the cluster change the spark version using <code>export SPARK_MAJOR_VERSION=2</code></p>
+<h2 is-upgraded>Virtual enviornment</h2>
+<p>The cluster environment may not have MLflow installed on it. Additionally, it won&#39;t allow system-wide changes on it. Also to make sure that our project doesn&#39;t mess with original directories and scripts. It&#39;s necessary to run our program inside python virtual environment <em>(virtualenv)</em>.</p>
+<h2 is-upgraded>StructField &amp; StructTypes</h2>
+<p>Both the programs are tailored to read any given csv data-set. To see the data-set into tabular format one has to pass schema of the dataset. In current implementation, the schema is generated using the column names, StructFields and StructTypes (Spark attributes). *(Tip: For getting column names, use <em>Pandas</em><code>dataframe.columns</code> command which will save all names in an array.)*</p>
+<p>Both the programs take csv-train files to log evaluation metrics into MLflow ui.</p>
+<h2 is-upgraded>Parameters &amp; Arguments</h2>
+<p>Common arguments are:</p>
+<ul>
+<li>experiment_name: The name under which all the models should be logged.</li>
+<li>data_path</li>
+<li>describe (bool): If you want a glimpse of what data looks like (important when performing preprocessing on the dataset)</li>
+</ul>
+<p>For model specific arguments, check the program as well as official Spark MLlib documentation.</p>
+<h3 is-upgraded>Note for running predict program</h3>
+<p>The model in predict function is picked up via <em>run_id</em> of the logged MLflow model. The relative path to the spark model is taken by using formatted string literals or <code>f-strings</code>. If you train the model on cluster and you call predict on a different system, then because of relative path difference you would have to manually pass that model to predict program. Also f-string is not supported on python version 2 (Currently installed on cluster).</p>
+<ul>
+<li>Select the run_id for the model on which you want to predict, by going into MLruns-&gt; experiment_id -&gt; artifacts -&gt; <em>model</em></li>
+<li>Copy that model in the same directory from where the program is running.</li>
+</ul>
+<h2 is-upgraded>Performance tracking</h2>
+<p>For the current task, ideal case would be to use spark <em>cross-validator</em> with our range of parameter grid and record a metric for each of the individual model. But that is currently only supported running on databricks server. <a href="https://docs.databricks.com/applications/machine-learning/automl/mllib-mlflow-integration.html" target="_blank">MLlib- MLflow integration</a> So the performance_metric program shows an outline for manually tracking the performance over different values (or even timesteps), one hyperparameter at a time, to show the generalized performance of that algorithm. It takes an additional argument</p>
+<pre><code>parser.add_argument(&#34;--parameter&#34;, dest=&#34;parameter&#34;, help=&#34;parameter&#34;, required=True)
+</code></pre>
+<p>which in this case can be <code>maxIter</code>, <code>aggregationDepth</code> or <code>regParam</code>. It will iterate over range of values for one of the selected parameter keeping others at a default value. We can even combine these parameters in loops to see other results.</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/codelab-elements/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/prettify.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/codelab-elements.js"></script>
+
+</body>
+</html>
