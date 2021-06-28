@@ -8,3 +8,5 @@ Build and compiled on Google Codelabs design language [link](https://github.com/
 
 [Spark using MLflow](https://yashshah1995.github.io/Spark_MLflow/)
 
+[Snorkel Data-labelling](https://yashshah1995.github.io/Snorkel_guide/)
+
